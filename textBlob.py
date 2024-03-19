@@ -6,7 +6,7 @@ import pandas as pd
 from IPython.display import display
 
 # Query the survey's that do have a commment. 
-df = pd.read_sql("SELECT top 500 * FROM [dbo].[Patient_Satisfaction_Survey] WHERE Comments != ''", engine, index_col= 'ID')
+df = pd.read_sql("SELECT top 500 * FROM [dbo].[Patient_Satisfaction_Survey] WHERE Comments != ''", engine)
 
 """
 # fetch all makes a list of rows and rows are pyodbc objects that are tuple like. Can access columns using the colomn name or the index (rows.Comments)
@@ -46,13 +46,31 @@ df = pd.DataFrame(data)
 comment = TextBlob(row.Comments)
 polarity.append(comment.sentiment.polarity)
 """
+# Input :takes a string 
+# returns a list of strings 
+def make_sentences(comment):
+    comment_blob = TextBlob(comment)
+    return comment_blob.sentences 
 
 # Find the polarity btwn (-1,1) -1 being negative and 1 being positive
 def find_polarity(comment):
-    return TextBlob(comment).sentiment.polarity
+    return comment.sentiment.polarity
 
 # Add the Polarity to the dataframe 
-df["Polarity"] = df['Comments'].map(find_polarity)
+# df["Polarity"] = df['Comments'].map(find_polarity)
+
+# make list of surveys and their sentences -- survey is the df 
+def survey_sentences(survey):
+    sent = [] # list of tuples 
+    for row in survey.index:
+        for s in make_sentences(survey['Comments'][row]):
+            sent.append((survey['ID'][row] , s))
+    return sent
+
+data = survey_sentences(df)
+# Create new DF with the ID of the survey and the polarity scores of the sentences 
+polarity_df = pd.DataFrame(data , columns = ['ID', 'Sentences'])
+polarity_df["Polarity"] = polarity_df['Sentences'].map(find_polarity)
 
 # Determine, based on ratings and polarity scores which surveys are negative and positive
 # add a column with the final categorization 
