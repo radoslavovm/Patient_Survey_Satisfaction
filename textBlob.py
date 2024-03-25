@@ -5,9 +5,6 @@ import pandas as pd
 # importing the modules
 from IPython.display import display
 
-# Query the survey's that do have a commment. 
-df = pd.read_sql("SELECT top 500 * FROM [dbo].[Patient_Satisfaction_Survey] WHERE Comments != ''", engine)
-
 """
 # fetch all makes a list of rows and rows are pyodbc objects that are tuple like. Can access columns using the colomn name or the index (rows.Comments)
 ttest = cursor.execute("SELECT top 100 * FROM [dbo].[Patient_Satisfaction_Survey] WHERE Comments != ''")
@@ -54,27 +51,18 @@ def make_sentences(comment):
 
 # Find the polarity btwn (-1,1) -1 being negative and 1 being positive
 def find_polarity(comment):
-    return comment.sentiment.polarity
+    return TextBlob(comment).sentiment.polarity
 
-# Add the Polarity to the dataframe 
-# df["Polarity"] = df['Comments'].map(find_polarity)
-
-# make list of surveys and their sentences -- survey is the df 
+# for each survey comment, make list of sentences and their survey ID -- survey is the df 
 def survey_sentences(survey):
     sent = [] # list of tuples 
     for row in survey.index:
         for s in make_sentences(survey['Comments'][row]):
-            sent.append((survey['ID'][row] , s))
+            sent.append((survey['ID'][row] , str(s)))
     return sent
-
-data = survey_sentences(df)
-# Create new DF with the ID of the survey and the polarity scores of the sentences 
-polarity_df = pd.DataFrame(data , columns = ['ID', 'Sentences'])
-polarity_df["Polarity"] = polarity_df['Sentences'].map(find_polarity)
 
 # Determine, based on ratings and polarity scores which surveys are negative and positive
 # add a column with the final categorization 
-
 def determine_sentiment(r):
     rating_loc = [
         df.columns.get_loc('Overall, please rate your most recent experience at Advanced Rad')
@@ -98,18 +86,28 @@ def determine_sentiment(r):
     else :
         return "Very Negative"
 
-df['Final_Rating'] = df.apply(determine_sentiment, axis=1)
+# Process:
 
-display(df.groupby('Final_Rating').count())
+# Query the survey's that do have a commment. 
+df = pd.read_sql("SELECT top 500 * FROM [dbo].[Patient_Satisfaction_Survey] WHERE Comments != ''", engine)
 
+# data is a list of the survey sentences and their IDs
+data = survey_sentences(df)
+# Create new DF with the ID of the survey and the polarity scores of the sentences 
+polarity_df = pd.DataFrame(data , columns = ['ID', 'Sentences'])
+polarity_df["Polarity"] = polarity_df['Sentences'].map(find_polarity)
+
+#this is a final categorization. Created before sentences were separated. 
+#Need to rethink best approach for a final category. should we create one at all? 
+#df['Final_Rating'] = df.apply(determine_sentiment, axis=1)
+#display(df.groupby('Final_Rating').count())
 # df.query('Final_Rating' == 'Very Negative' and 'Polarity' )
+# df.count()
 
-df.count()
-
-# df.to_csv("patient_satisfaction.csv")
+polarity_df.to_csv("patient_satisfaction.csv")
 
 # can change if_exists to append, and add in a date feature to minimize processing power
-# df.to_sql("PatientSatisfactionSurveyScores", engine, if_exists='replace')
+#polarity_df.to_sql("ARC_DW.[dbo].[PatientSatisfactionSurveyScores]", engine, if_exists='replace')
 
 # what Names are assoc with negative/positive score
 # what are the ratio of scores for each office 
