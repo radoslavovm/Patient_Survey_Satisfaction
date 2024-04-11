@@ -1,9 +1,6 @@
 from textblob import TextBlob
-#from connection import cursor
 from connection import engine
 import pandas as pd
-# importing the modules
-from IPython.display import display
 
 """
 # fetch all makes a list of rows and rows are pyodbc objects that are tuple like. Can access columns using the colomn name or the index (rows.Comments)
@@ -43,17 +40,24 @@ df = pd.DataFrame(data)
 comment = TextBlob(row.Comments)
 polarity.append(comment.sentiment.polarity)
 """
-# Input :takes a string 
+
+# Taking the comment of a survey and seperating the strings out
+# Input : takes a string 
 # returns a list of strings 
 def make_sentences(comment):
     comment_blob = TextBlob(comment)
     return comment_blob.sentences 
 
+
 # Find the polarity btwn (-1,1) -1 being negative and 1 being positive
-def find_polarity(comment):
-    return TextBlob(comment).sentiment.polarity
+# Input : takes a string (a sentence from a comment)
+# returns a list of strings 
+def find_polarity(sentence):
+    return TextBlob(sentence).sentiment.polarity
 
 # for each survey comment, make list of sentences and their survey ID -- survey is the df 
+# Input : takes a string (a sentence from a comment)
+# returns a tuple of the sentence and the survey ID
 def survey_sentences(survey):
     sent = [] # list of tuples 
     for row in survey.index:
@@ -61,20 +65,21 @@ def survey_sentences(survey):
             sent.append((survey['ID'][row] , str(s)))
     return sent
 
-# Determine, based on ratings and polarity scores which surveys are negative and positive
-# add a column with the final categorization 
+# Determine, based on ratings and polarity scores which surveys are negative and positive add a column with the final categorization 
+# Input : a DF of the surveys 
+# returns a string that is the overall rating category 
 def determine_sentiment(r):
     rating_loc = [
-        df.columns.get_loc('Overall, please rate your most recent experience at Advanced Rad')
-        , df.columns.get_loc('How would you describe your check-in experience at the office')
-        , df.columns.get_loc('How would you describe your experience with the technologist')
-        , df.columns.get_loc('How would you describe your scheduling experience')
-        , df.columns.get_loc('How likely are you to recommend Advanced Radiology to your friend')]
+        r.columns.get_loc('Overall, please rate your most recent experience at Advanced Rad')
+        , r.columns.get_loc('How would you describe your check-in experience at the office')
+        , r.columns.get_loc('How would you describe your experience with the technologist')
+        , r.columns.get_loc('How would you describe your scheduling experience')
+        , r.columns.get_loc('How likely are you to recommend Advanced Radiology to your friend')]
     ratings = [r[index] for index in rating_loc]
 
     positive_ratings = all(rating > 2 for rating in ratings)
 
-    polarity_loc = df.columns.get_loc('Polarity')
+    polarity_loc = r.columns.get_loc('Polarity')
     if r[polarity_loc] > 0:
         positive = True
     else : positive = False
@@ -85,30 +90,3 @@ def determine_sentiment(r):
         return "Negative"
     else :
         return "Very Negative"
-
-# Process:
-
-# Query the survey's that do have a commment. 
-df = pd.read_sql("SELECT top 500 * FROM [dbo].[Patient_Satisfaction_Survey] WHERE Comments != ''", engine)
-
-# data is a list of the survey sentences and their IDs
-data = survey_sentences(df)
-# Create new DF with the ID of the survey and the polarity scores of the sentences 
-polarity_df = pd.DataFrame(data , columns = ['ID', 'Sentences'])
-polarity_df["Polarity"] = polarity_df['Sentences'].map(find_polarity)
-
-#this is a final categorization. Created before sentences were separated. 
-#Need to rethink best approach for a final category. should we create one at all? 
-#df['Final_Rating'] = df.apply(determine_sentiment, axis=1)
-#display(df.groupby('Final_Rating').count())
-# df.query('Final_Rating' == 'Very Negative' and 'Polarity' )
-# df.count()
-
-polarity_df.to_csv("patient_satisfaction.csv")
-
-# can change if_exists to append, and add in a date feature to minimize processing power
-#polarity_df.to_sql("ARC_DW.[dbo].[PatientSatisfactionSurveyScores]", engine, if_exists='replace')
-
-# what Names are assoc with negative/positive score
-# what are the ratio of scores for each office 
-
