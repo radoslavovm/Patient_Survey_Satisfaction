@@ -1,5 +1,4 @@
 from textblob import TextBlob
-from connection import engine
 import pandas as pd
 
 """
