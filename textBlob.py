@@ -1,45 +1,6 @@
 from textblob import TextBlob
 import pandas as pd
 
-"""
-# fetch all makes a list of rows and rows are pyodbc objects that are tuple like. Can access columns using the colomn name or the index (rows.Comments)
-ttest = cursor.execute("SELECT top 100 * FROM [dbo].[Patient_Satisfaction_Survey] WHERE Comments != ''")
-rows = ttest.fetchall()
-print(rows)
-
-ids = [] , comments = [] , overall = [] ,checkin = [] ,tech = [] ,sched = [] 
-#"Overall, please rate your most recent experience at Advanced Rad" 
-overall_exp = 2
-# 'How would you describe your check-in experience at the office' 
-check_in = 3
-# 'How would you describe your experience with the technologist' 
-tech_exp = 4
-# 'How would you describe your scheduling experience' 
-sched_exp  = 5
-
-    ids.append(row.ID)
-    comments.append(row.Comments)
-    overall.append(row[overall_exp])
-    checkin.append(row[check_in])
-    tech.append(row[tech_exp])
-    sched.append(row[sched_exp])
-
-data = {
-    'ID' : ids
-    ,'overall' : overall
-    , 'check-in' : checkin
-    , 'technologist' : tech
-    , 'scheduling' : sched
-    , 'Comment' : comments
-    , 'Polarity' : polarity
-}
-
-df = pd.DataFrame(data)
-
-comment = TextBlob(row.Comments)
-polarity.append(comment.sentiment.polarity)
-"""
-
 # Taking the comment of a survey and seperating the strings out
 # Input : takes a string 
 # returns a list of strings 
@@ -67,19 +28,20 @@ def survey_sentences(survey):
 # Determine, based on ratings and polarity scores which surveys are negative and positive add a column with the final categorization 
 # Input : a DF of the surveys 
 # returns a string that is the overall rating category 
-def determine_sentiment(r):
+def determine_sentiment(rrow):
     rating_loc = [
-        r.columns.get_loc('Overall, please rate your most recent experience at Advanced Rad')
-        , r.columns.get_loc('How would you describe your check-in experience at the office')
-        , r.columns.get_loc('How would you describe your experience with the technologist')
-        , r.columns.get_loc('How would you describe your scheduling experience')
-        , r.columns.get_loc('How likely are you to recommend Advanced Radiology to your friend')]
-    ratings = [r[index] for index in rating_loc]
+        rrow.columns.get_loc('Overall, please rate your most recent experience at Advanced Rad')
+        , rrow.columns.get_loc('How would you describe your check-in experience at the office')
+        , rrow.columns.get_loc('How would you describe your experience with the technologist')
+        , rrow.columns.get_loc('How would you describe your scheduling experience')
+        , rrow.columns.get_loc('How likely are you to recommend Advanced Radiology to your friend')]
+    ratings = [rrow[index] for index in rating_loc]
 
+    # TRUE if the rating for all 5 questions is above 2
     positive_ratings = all(rating > 2 for rating in ratings)
 
-    polarity_loc = r.columns.get_loc('Polarity')
-    if r[polarity_loc] > 0:
+    polarity_loc = rrow.columns.get_loc('Polarity')
+    if rrow[polarity_loc] > 0:
         positive = True
     else : positive = False
 

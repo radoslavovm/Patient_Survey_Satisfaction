@@ -11,4 +11,5 @@ Clustering.py
 
 Connection.py 
     Here we establish a connection to the database. 
-    I am having issues with establishing a connection using my credentials because the username includes a domain seperated by a \
+    You will need a JSON file with the database credentials to be able to run this program
+    

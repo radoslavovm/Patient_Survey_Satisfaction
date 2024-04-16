@@ -161,3 +161,4 @@ cython_debug/
 patient_satisfaction_results.csv
 patient_satisfaction_results.xlsx
 patient_satisfaction.xlsx
+config.json
