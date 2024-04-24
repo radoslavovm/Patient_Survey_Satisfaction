@@ -22,8 +22,12 @@ def survey_sentences(survey):
     sent = [] # list of tuples 
     for row in survey.index:
         for s in make_sentences(survey['Comments'][row]):
-            sent.append((survey['ID'][row] , str(s)))
+            sent.append((row , str(s)))
     return sent
+
+#returns the column position in the df
+def get_column_loc(ddf, col_name):
+    return ddf.columns.get_loc(col_name)
 
 # Determine, based on ratings and polarity scores which surveys are negative and positive add a column with the final categorization 
 # Input : a DF of the surveys 

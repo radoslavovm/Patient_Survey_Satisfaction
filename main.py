@@ -9,17 +9,20 @@ def main():
     WHERE Comments != ''
     """
     # Query the survey's that do have a commment. 
-    df = pd.read_sql(sql, conn.engine)
+    df = pd.read_sql(sql, conn.engine).set_index('ID').drop_duplicates()
 
     # data is a list of the survey sentences and their IDs
     data = tb.survey_sentences(df)
+    
 
     # Create new DF with the ID of the survey and the polarity scores of the sentences 
     polarity_df = pd.DataFrame(data , columns = ['ID', 'Sentences'])
     polarity_df["Polarity"] = polarity_df['Sentences'].map(tb.find_polarity)
-    polarity_df["Overall_Sentiment"] = polarity_df.map(tb.determine_sentiment) 
-
-    polarity_df.to_csv("patient_satisfaction.csv") ## Output resulting dataframe in a csv
+    
+    #result = polarity_df.join(df, on='ID')
+    #result["Overall_Sentiment"] = result.map(tb.determine_sentiment(result)) 
+    
+    #polarity_df.to_csv("patient_satisfaction.csv") ## Output resulting dataframe in a csv
 
     # can change if_exists to append, and add in a date feature to minimize processing power
     polarity_df.to_sql("PatientSatisfactionSurveyScores", conn.engine, if_exists='replace')
