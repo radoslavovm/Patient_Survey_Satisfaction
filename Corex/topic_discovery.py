@@ -85,7 +85,7 @@ def plot_composition(visuals_df, no_topics, color_choice, legend_pos='upper left
     colors = sns.color_palette(color_choice, no_topics + 1)
 
     # Bar Plot
-    sns.set(rc={'figure.figsize': (20, 7), 'axes.facecolor': 'white'})
+    sns.set_theme(rc={'figure.figsize': (20, 7), 'axes.facecolor': 'white'})
     sns.barplot(x="x", y="y", data=df_temp, palette=colors)
     plt.xlabel('Topic', weight='bold').set_fontsize('18')
     plt.ylabel('Percent of Total', weight='bold').set_fontsize('18')

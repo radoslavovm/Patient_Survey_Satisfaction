@@ -24,21 +24,21 @@ Design:
 """
 
 # Import the previously cleaned data to save some time
-chatlogs = pd.read_csv('Data/data.csv')
+chatlogs = pd.read_csv('Data/sample_data.csv')
 
 
 # Assign topic choices here
 topic_choices = [
     [
-        'AccessCodes',
-        ['access', 'code', 'multi', 'key'],
+        'Scheduling',
+        ['schedul', 'wait time'],
         [],
         []
 
     ],
     [
         'Frustration',
-        ['speak with agent', 'annoyed', 'again', 'fuck', 'stupid'],
+        ['embarrass', 'annoyed', 'again', 'fuck', 'stupid'],
         [],
         []
     ]
