@@ -1,14 +1,13 @@
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
-from IPython.display import display
 from collections import Counter
 import re
-import seaborn as sns
 from operator import add
 from sklearn.feature_extraction.text import TfidfVectorizer
 from corextopic import corextopic as ct
-
+# from IPython.display import display
+# import seaborn as sns
 
 ###############
 # CorEx Setup #
@@ -28,7 +27,7 @@ def prepare_vectorizer(chatlogs, column_choices, ngram_range):
 
     vectorizer = vectorizer.fit(chatlogs['STEMMED'].values.astype('U'))
     tfidf = vectorizer.transform(chatlogs['STEMMED'].values.astype('U'))
-    vocab = vectorizer.get_feature_names()
+    vocab = vectorizer.get_feature_names_out()
 
     return no_topics, vectorizer, tfidf, vocab
 
@@ -56,7 +55,7 @@ def get_most_common_tokens(df_input, choice, ss_choice=10, num_most_common_token
         mct_t = most_common_tokens.transpose()
         mct_t.columns = list(range(1, 21))
         mct_t.index = ['Word', 'Count']
-        display(mct_t)
+        # display(mct_t)
     else:
         most_common_tokens = pd.DataFrame(
             Counter(" ".join(slice_df['LEMMATIZED']).split()).most_common(num_most_common_tokens))
@@ -66,11 +65,11 @@ def get_most_common_tokens(df_input, choice, ss_choice=10, num_most_common_token
             s_mct_t.columns = list(
                 range(1 + set_of_twenty * 20, min(21 + set_of_twenty * 20, len(most_common_tokens) + 1)))
             s_mct_t.index = ['Word', 'Count']
-            display(s_mct_t)
+            # display(s_mct_t)
 
     # Print sample of topic
     print('\n\033[1mSample of ' + choice + '\033[0m (Size ' + str(ss_choice) + ')')
-    display(slice_df.sample(ss_choice))
+    # display(slice_df.sample(ss_choice))
 
     return slice_df, most_common_tokens
 
@@ -82,11 +81,11 @@ def get_most_common_tokens(df_input, choice, ss_choice=10, num_most_common_token
 def plot_composition(visuals_df, no_topics, color_choice, legend_pos='upper left'):
     df_temp = pd.DataFrame(visuals_df['Identifier'].value_counts(normalize=True)).reset_index()
     df_temp.columns = ['x', 'y']
-    colors = sns.color_palette(color_choice, no_topics + 1)
+    # colors = sns.color_palette(color_choice, no_topics + 1)
 
     # Bar Plot
-    sns.set_theme(rc={'figure.figsize': (20, 7), 'axes.facecolor': 'white'})
-    sns.barplot(x="x", y="y", data=df_temp, palette=colors)
+    # sns.set_theme(rc={'figure.figsize': (20, 7), 'axes.facecolor': 'white'})
+    # sns.barplot(x="x", y="y", data=df_temp, palette=colors)
     plt.xlabel('Topic', weight='bold').set_fontsize('18')
     plt.ylabel('Percent of Total', weight='bold').set_fontsize('18')
     plt.grid(False)
@@ -94,10 +93,10 @@ def plot_composition(visuals_df, no_topics, color_choice, legend_pos='upper left
     plt.show()
 
     # Stacked Bar
-    colors = sns.color_palette(color_choice, no_topics + 1)[::-1]
-    ax = df_temp.set_index('x').transpose().plot(kind='bar', stacked=True, legend='reverse', width=0.25,
-                                                 figsize=[10, 8],
-                                                 color=colors)
+    # colors = sns.color_palette(color_choice, no_topics + 1)[::-1]
+    # ax = df_temp.set_index('x').transpose().plot(kind='bar', stacked=True, legend='reverse', width=0.25,
+    #                                             figsize=[10, 8],
+    #                                             color=colors)
     plt.legend(loc=legend_pos)
 
     handles, labels = ax.get_legend_handles_labels()
@@ -111,7 +110,7 @@ def plot_composition(visuals_df, no_topics, color_choice, legend_pos='upper left
     plt.subplots(figsize=[15, 9])
     ax = plt.pie(x=df_temp.y, labels=df_temp.x,
                  pctdistance=0.85, normalize=True,
-                 colors=colors, textprops={'fontsize': 24},
+    #             colors=colors, textprops={'fontsize': 24},
                  )
     centre_circle = plt.Circle((0, 0), 0.70, fc='white')
     fig = plt.gcf()
@@ -125,7 +124,7 @@ def plot_composition(visuals_df, no_topics, color_choice, legend_pos='upper left
     plt.subplots(figsize=[15, 9])
     _, _, autotexts = plt.pie(x=df_temp.y, labels=df_temp.x,
                               pctdistance=0.85, normalize=True,
-                              colors=colors, autopct='%1.1f%%',
+      #                        colors=colors, autopct='%1.1f%%',
                               textprops={'fontsize': 24},
                               )
     for autotext in autotexts:
@@ -204,7 +203,7 @@ def ngram_distributions(visuals_df, column_choices, color_choice, bad_ngrams=[],
         if word == 'Junk': column_choices.remove(word)
 
     # Create DF for plotting
-    colors = sns.color_palette(color_choice, len(column_choices) + 1)
+    #colors = sns.color_palette(color_choice, len(column_choices) + 1)
     x = get_makeup(mcbt, visuals_df)
     x.index = [str(x).replace('(', '').replace(')', '').upper() for x in mcbt.index]
     for bad_ngram in bad_ngrams:
@@ -220,7 +219,8 @@ def ngram_distributions(visuals_df, column_choices, color_choice, bad_ngrams=[],
 
     # Plot all topics together in one chart
     ax = x2.plot(kind='barh', stacked=True, figsize=(plotsize_x, plotsize_y),
-                 color=colors, rot=0, fontsize=15, legend='bottom right')
+     #            color=colors, rot=0, fontsize=15, legend='bottom right'
+     )
     if allow_title == True: plt.title('Most Common N-Grams', fontsize=30)
     plt.xlabel('Frequency', fontsize=18, labelpad=25)
     plt.ylabel('N-Gram', fontsize=18, labelpad=25)
@@ -242,7 +242,7 @@ def ngram_distributions(visuals_df, column_choices, color_choice, bad_ngrams=[],
         l_both = l_bigrams + l_trigrams
         mcbt = pd.DataFrame([x[1:] for x in re.split('\), ', l_both)]).value_counts()[0:10 + len(bad_ngrams)]
 
-        colors = sns.color_palette(color_choice, len(column_choices))
+        #colors = sns.color_palette(color_choice, len(column_choices))
         x = get_makeup(mcbt, slice_summary_df)
         x.index = [str(x).replace('(', '').replace(')', '').replace("'", "").upper()[:-1] for x in mcbt.index]
 
@@ -260,7 +260,7 @@ def ngram_distributions(visuals_df, column_choices, color_choice, bad_ngrams=[],
         x2 = x2[0:10]
         x2 = x2 / max(x2.values)
 
-        ax = x2.plot(kind='barh', figsize=(plotsize_x, plotsize_y), color=colors[color_counter], rot=0, fontsize=15,
+        ax = x2.plot(kind='barh', figsize=(plotsize_x, plotsize_y), #color=colors[color_counter], rot=0, fontsize=15,
                      legend='')
         if allow_title == True: plt.title(column_choices[color_counter], fontsize=30)
         ax.grid(False)

@@ -136,7 +136,7 @@ def generate_chatlog_with_ngrams(chats):
 def preprocessing(filepath):
     custom_stopwords = ['potato', 'anna', 'I', 'm', '+', 'chat', 'i']
 
-    col_of_interest = 'Live Chat Transcript: Body'
+    col_of_interest = 'Comment'
     limit = 8000
 
     chatlogs_raw = read_in_chatlogs(filepath, col_of_interest, max_chats=limit)
@@ -155,11 +155,11 @@ def preprocessing(filepath):
     filename = os.path.basename(filepath)
 
     # Export to CSV
-    chatlogs_out.to_csv('Data/cleaned_'+filename, index=False)
+    chatlogs_out.to_csv('PatientSatisfactionSurvey\Data\cleaned_'+filename, index=False)
 
 
 # endregion
 
-cengage_filepath = '/Users/martina.radoslavov/Documents/Clients:Projects/Cengage/cengage-w-intent.csv'
+cengage_filepath = 'PatientSatisfactionSurvey\Data\sample_data.csv'
 
 preprocessing(cengage_filepath)

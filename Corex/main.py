@@ -24,14 +24,14 @@ Design:
 """
 
 # Import the previously cleaned data to save some time
-chatlogs = pd.read_csv('Data/sample_data.csv')
+chatlogs = pd.read_csv('PatientSatisfactionSurvey\Data\cleaned_sample_data.csv')
 
 
 # Assign topic choices here
 topic_choices = [
     [
         'Scheduling',
-        ['schedul', 'wait time'],
+        ['schedul', 'wait time', 'wait'],
         [],
         []
 
@@ -39,6 +39,18 @@ topic_choices = [
     [
         'Frustration',
         ['embarrass', 'annoyed', 'again', 'fuck', 'stupid'],
+        [],
+        []
+    ],
+    [
+        'Satisfaction',
+        ['pleasure', 'joy', 'happy', 'kind', 'Thank you'],
+        [],
+        []
+    ],
+    [
+        'Rude Technologists',
+        ['rude', 'impatient', 'tech', 'front desk', 'uncomfortable', 'loud'],
         [],
         []
     ]
@@ -104,7 +116,7 @@ print(vcs)
 print(sum(vcs))
 
 # Export labelled chats
-summary_df.to_csv('Data/labelled_data.csv', index=False)
+summary_df.to_csv('PatientSatisfactionSurvey\Data\labelled_data.csv', index=False)
 
 
 # For each topic, return the most common keywords
