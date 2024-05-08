@@ -1,6 +1,7 @@
 import connection as conn
 import textBlob as tb
 import pandas as pd
+import traceback
 
 def main():
     sql = """
@@ -35,4 +36,10 @@ def main():
     print(pd.read_sql(sql_test, conn.engine))
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+        print("job complete")
+    
+    except Exception as e:
+        with open("exceptions.txt", 'a') as logfile:
+            traceback.print_exc(file=logfile)
