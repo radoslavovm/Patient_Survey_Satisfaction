@@ -6,9 +6,6 @@ Using [TextBlob](https://textblob.readthedocs.io/en/dev/quickstart.html#sentimen
 TextBlob.py 
     Functions involved in taking in a Patient Satisfaction Survey table, and creating a new table with the Survey ID and the polarity of each sentence.
 
-Clustering.py
-    This is for clustering similar sentences together. Purpose it to be able to see the distribution of topics in the survey comments and see what the most common category of complaints are. 
-
 Connection.py 
     Here we establish a connection to the database. 
     You will need a JSON file with the database credentials to be able to run this program
